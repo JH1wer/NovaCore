@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <json-c/json.h>
-#include <math.h>
+#include <string.h>
 
 #define DISCORD_ENDPOIT "https://discord.com/api/"
 #define API_VERSION "v10/"
