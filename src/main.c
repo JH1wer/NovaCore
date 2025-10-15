@@ -90,7 +90,6 @@ int main(int argc, char *argv[])
         headers = curl_slist_append(headers, auth_header);
 
         printf("full api url: %s\n", constructApiUrl);
-        printf("your discord app token: ***...\n\n");
 
         curl_easy_setopt(curl, CURLOPT_URL, constructApiUrl);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -105,19 +104,50 @@ int main(int argc, char *argv[])
         }
         else
         {
-            struct json_object *parsed_json = json_tokener_parse(chunk.memory);
+            char *notfound = "_not_found";
 
-            struct json_object *username;
+            typedef struct
+            {
+                char *name;
+                char *id;
+                char *description;
+            } BotInfo;
+
+            BotInfo bot;
+
+            struct json_object *parsed_json = json_tokener_parse(chunk.memory);
+            struct json_object *username, *id, *description;
+
             if (json_object_object_get_ex(parsed_json, "username", &username))
             {
-                printf("username: %s\n", json_object_get_string(username));
+                bot.name = strdup(json_object_get_string(username));
             }
             else
             {
-                printf("Campo 'username' nao encontrado.\n");
+                bot.name = strdup(notfound);
+            }
+
+            if (json_object_object_get_ex(parsed_json, "id", &id))
+            {
+                bot.id = strdup(json_object_get_string(id));
+            }
+            else
+            {
+                bot.id = strdup(notfound);
+            }
+            if (json_object_object_get_ex(parsed_json, "description", &description))
+            {
+                bot.description = strdup(json_object_get_string(description));
+            }
+            else
+            {
+                bot.description = strdup(notfound);
             }
 
             json_object_put(parsed_json);
+
+            printf("name: %s\ndesc: %s\nid: %s\ntoken: %s\n\n", bot.name, bot.description, bot.id, token);
+            printf("bruh\n");
         }
 
         curl_easy_cleanup(curl);
